@@ -1,0 +1,4 @@
+POO es un estilo de programacion basado en clases de objetos, segmentar un todo en partes pequeñas que trabajen por un fin
+JS implementa el POO mediante Class Elements
+
+- Metodo For In:  
