@@ -3,7 +3,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/made-with-javascript.svg)](https://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
 
-![image]()
+<img src="https://github.com/DraCaligari/DS2022/blob/main/Archivos/PinClipart.com_charmander-clipart_3027530.png?raw=true" width="200" heigth="200" align="center"/>
 
 # Resume
 
