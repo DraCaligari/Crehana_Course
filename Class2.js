@@ -82,4 +82,14 @@ user1.pets = {
 
 const {favoriteFoods, pets: {name, color = `yellow` }} = user1;
 
-console.log(favoriteFoods, color)
+//console.log(favoriteFoods, color)
+
+//sirve para congelar datos que no se modifiquen, no se agregan propiedades ni se cambian los datos
+
+//Object.freeze(user1);
+
+//permite modificar las propiedades, no las borra, tampoco agrega propiedades
+//Para evitar moidificaciones sencillas como borrado o adiccion
+Object.seal(user1)
+
+console.log(user1)
