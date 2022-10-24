@@ -9,11 +9,10 @@ let team2 = {
     starter: false,
 };
 
-const UIclass = UI();
-Object.freeze(UIclass);
+const UIclass = new UI();
 
 const resetTeams = () => { 
-    Selection.forEach(select => ((select.disabled = false), (select.value = '0')));
+    selects.forEach(select => ((select.disabled = false), (select.value = '0')));
 
     [team1, team2].forEach(team => (team.starter = false));
 
@@ -36,40 +35,40 @@ const setMessage = (offense, offenseTeam, defense) => {
 }
 
 const startBattles = () => {
-    const fight = Fight(team1, team2);
+    const fight = new Fight(team1, team2);
     const [team1Organized, team2Organized] = fight.organizeTeams();
 
     team1Organized.members.forEach((member, position) => {
         const opponent = team2Organized.members[position];
-        fight.currentFight(position);
+        fight.currentFight = position;
 
         while (true) {
-            if (!fight.areStillFighting()) {
+            if (!fight.areStillFighting) {
                 break;
             }
 
             fight.f1vsf2(team1Organized.name);
             setMessage(member, team1Organized.name, opponent);
 
-            if (!fight.areStillFighting()) {
+            if (!fight.areStillFighting) {
                 break;
             }
 
             fight.f1vsf2(team2Organized.name);
             setMessage(opponent, team2Organized.name, member);
 
-            if (!fight.areStillFighting()){
+            if (!fight.areStillFighting){
                 break;
             }
         }
 
         renderWinner(
-            member.isAlive() ? member.name : opponent.name,
-            member.isAlive () ? opponent.name : member.name
+            member.isAlive ? member.name : opponent.name,
+            member.isAlive ? opponent.name : member.name
         );
     });
 
-    selectWinner(fight.selectWinner());
+    selectWinner(fight.selectWinner);
 }
 
 const startFight = () => {
@@ -79,8 +78,8 @@ const startFight = () => {
         return;
     }
 
-    team1.members = team1.members.map(pokemon => Pokemon(pokemon));
-    team2.members = team2.members.map(pokemon => Pokemon(pokemon));
+    team1.members = team1.members.map(pokemon => new Pokemon(pokemon));
+    team2.members = team2.members.map(pokemon => new Pokemon(pokemon));
 
     const selectStarter = Math.round(Math.random());
     const starter = [team1, team2].filter(
