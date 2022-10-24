@@ -1,119 +1,78 @@
-function Pokemon (name) {
-    let pokemon = Object.create({});
-    pokemon.name = name;
-    pokemon.health = 100;
-    pokemon.powerAttack = Math.ceil(Math.random()* 50 + 25);
-    pokemon.powerDefense = Math.ceil(Math.random()* 50 + 25);
-    pokemon.attack = function(){
-        return pokemon.powerAttack
-    };
-    pokemon.isAlive = function(){
-        return pokemon.health
-    };
-    pokemon.recieveDamage = function(){
-        pokemon.health -= damage;
-    }
+let pokemons = [];
+let selects = [];
 
-    return pokemon;
-}
+// Request the Sprite for the Pokemon Selected
+const getSprite = async pokemon => {
+  try {
+    const pokeData = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${pokemon}`
+    );
+    const { sprites } = await pokeData.json();
 
-function Fight(team1, team2) {
-    let fight = Object.create({});
-    fight.team1 = team1;
-    fight.team2 = team2;
-    fight.organizeTeams = function(){
-        return[fight.team1, fight.team2].sort((a,b) => b-starter - a.starter);
-    };
-    fight.currenFight = function(position){
-        fight.numberFight = position;
-    };
-    fight.f1vsf2 = function(teamName) {
-        const attacker = [fight.team1, fight.team2].filter(
-            team=> team.name === teamName
-        )[0];
+    return sprites.front_default;
+  } catch (error) {
+    return 'http://pm1.narvii.com/6508/dbd421799e1fc9118c02766e5c13836c87db6070_00.jpg';
+  }
+};
 
-        const defender = [fight.team1, fight.team2].filter(
-            team => team.name !== teamName
-        )[0];
+// Fill Options with the Name of the Pokemons
+const renderOptions = () => {
+  selects = document.querySelectorAll('select');
 
-        defender.members[fight.numberFight].recieveDamage(
-            attacker.members[fight.numberFight].attack()
-        );
-    };
+  selects.forEach(select => {
+    pokemons.forEach(pokemon => {
+      const option = document.createElement('option');
 
-    fight.areStillFighting = function (){
-        return(
-            fight.team1.members[fight.numberFight].isAlive &&
-            fight.team2.members[fight.numberFight].isAlive
-            );
-    };
-    fight.selectWinner = function(){
-        const team1Alive = fight.team1.members.filter(member => member.isAlive);
-        const team2Alive = fight.team2.members.filter(member => member.isAlive);
-        
-        return team1Alive.length > team2Alive.length 
-        ? fight.team1.name
-        : fight.team2.name;
-    };
+      option.innerText = pokemon.name[0].toUpperCase() + pokemon.name.slice(1);
+      option.value = pokemon.name;
 
-    return fight;
-}
+      select.appendChild(option);
+    });
+  });
+};
 
-function UI(){
-    let ui = new Object({});
-    ui.container = document.querySelector('#body');
-    ui.clearContainer = function () {
-        [...ui.container.children].forEach(child => {
-            ui.container.removeChild(child);
-        });
-    };
-    ui.createElement = function (type,classes) {
-        const element = document.createElement(type);
-        element.className = classes;
+// Fetch Pokemons name
+const loadPokemons = async () => {
+  try {
+    const pokeData = await fetch('https://pokeapi.co/api/v2/pokemon?limit=251');
+    const { results } = await pokeData.json();
 
-        return element;
-    };
-    ui.showMessage = function (message, variant, team) {
-        const pClasses = {
-            title: 'text-lg font-semibold text-pokemon-blue mb-3',
-            subtitle: 'text-base font-normal text-pokemon-blue mb-3 w-full',
-            'Team 1': 'text-left',
-            'Team 2': 'text-right',
-            result: 'text-lg font-semibold text-pokemon-red mt-5 mb-5 text-center',
-            final: 'text-4xl font-bold text-pokemon-yellow mt-5 mb-10',
-        };
+    pokemons = [...results];
 
-        const p = ui.createElement('p', `${pClasses[variant]} ${pClasses[team]}`);
-        p.innerText = message;
-        ui.container.appendChild(p);
-    };
+    renderOptions();
+  } catch (error) {
+    console.log('Something wrong happened');
+  }
+};
 
-    ui.showRestart = function(){
-        const button = ui.createElement(
-            'button',
-            'hover:bg-pokemon-blue text-pokemon-blue hover:text-white inline px-5 py-3 rounded-lg border border-pokemon-blue transition-all duration-125'
-        );
-        button.innerText = 'Restart battle';
-        button.onclick = resetTeams;
+// Show Pokemon Img when select option change
+const handleSelect = async ({ value, name }) => {
+  const sprite = await getSprite(value);
+  const img = document.querySelector(`#${name}`);
+  img.src = sprite;
+};
 
-        ui.container.appendChild(button);
-    };
+// Validate if all Pokemons are selected
+const checkPokemonSelected = () =>
+  [...selects].map(select => select.value).some(val => val === '0')
+    ? alert('You must choose 5 pokemons for each team')
+    : true;
 
-    ui.restart = function () {
-        ui.clearContainer();
-        document
-        .querySelectorAll('img')
-        .forEach(tag=> (tag.src= '.assets/pokeball.jpeg'));
+const validateTeams = () => {
+  const isReady = true; //checkPokemonSelected();
 
-        const button = ui.createElement(
-            'button',
-            'hover:bg-pokemon-blue text-pokemon-blue hover:text-white inline px-5 py-3 rounded-lg border border-pokemon-blue transition-all duration-125'
-        );
-        button.innerText = 'Star Fight';
-        button.onclick = startFight; 
+  if (isReady) {
+    selects.forEach(select => (select.disabled = true));
 
-        ui.container.appendChild(button);
-    }
+    team1.members = [...selects]
+      .filter(select => select.name.includes('team1') && select.value !== '0')
+      .map(select => select.value);
+    team2.members = [...selects]
+      .filter(select => select.name.includes('team2') && select.value !== '0')
+      .map(select => select.value);
+  }
 
-    return ui;
-}
+  return isReady;
+};
+
+window.addEventListener('load', loadPokemons);
